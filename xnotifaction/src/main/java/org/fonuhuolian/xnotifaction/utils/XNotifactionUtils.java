@@ -23,10 +23,24 @@ public class XNotifactionUtils {
      * 跳转到开启通知页面
      */
     public static void jumpToAppDetailsSettings(Context context) {
+
+        int uid = context.getApplicationInfo().uid;
+        String packageName = context.getApplicationContext().getPackageName();
+
         // 进入设置系统应用权限界面
-        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-        intent.setData(Uri.fromParts("package", context.getPackageName(), null));
-        context.startActivity(intent);
+        try {
+            Intent intent = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
+            intent.putExtra(Settings.EXTRA_APP_PACKAGE, packageName);
+            intent.putExtra(Settings.EXTRA_CHANNEL_ID, uid);
+            //这种方案适用于 API21——25，即 5.0——7.1 之间的版本可以使用
+            intent.putExtra("app_package", packageName);
+            intent.putExtra("app_uid", uid);
+            context.startActivity(intent);
+        } catch (Exception e) {
+            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+            intent.setData(Uri.fromParts("package", packageName, null));
+            context.startActivity(intent);
+        }
     }
 
 
